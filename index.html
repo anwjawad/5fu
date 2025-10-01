@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>5-FU — Assessment Form</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Utilities */
+    .form-row{ display:grid; grid-template-columns: repeat(12, 1fr); gap:12px; }
+    .col-1{ grid-column: span 1 / span 1; }
+    .col-2{ grid-column: span 2 / span 2; }
+    .col-3{ grid-column: span 3 / span 3; }
+    .col-4{ grid-column: span 4 / span 4; }
+    .col-6{ grid-column: span 6 / span 6; }
+    .col-8{ grid-column: span 8 / span 8; }
+    .col-12{ grid-column: 1 / -1; }
+    @media (max-width: 960px){
+      .col-1,.col-2,.col-3,.col-4,.col-6,.col-8{ grid-column: 1 / -1; }
+    }
+
+    .tabs{ display:flex; gap:8px; border-bottom:1px solid var(--border); margin-bottom:8px; position:sticky; top:-1px; z-index:40; background:linear-gradient(180deg, var(--surface), transparent); padding-bottom:8px; }
+    .tab-btn{
+      padding:8px 12px; border-radius:999px; border:1px solid var(--border);
+      background:var(--pill-bg); color:var(--text); cursor:pointer; font-weight:600; font-size:13px;
+    }
+    .tab-btn[aria-selected="true"]{ background:var(--primary); color:#0F2A21; border-color:transparent; }
+    .tab-panel{ display:none; }
+    .tab-panel.active{ display:block; }
+
+    .highlight label{ color:#FFD877; }
+    .highlight input{ box-shadow: 0 0 0 2px rgba(255,186,0,0.18); border-color: rgba(255,186,0,0.45); }
+    .icon{ width:16px; height:16px; display:inline-block; vertical-align:-3px; margin-right:6px; }
+    .table-card .card-title{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+
+    /* ===== Saved assessments: wrapper scroll (matches styles.css) ===== */
+    :root{
+      --ft-width: 100%;
+      --ft-height: 460px;
+      --ft-minw: 0px;
+      --ft-header-solid: #152742;
+      --ft-firstcol-solid: #1A2E51;
+    }
+
+    #saved-assessments{
+      max-height: var(--ft-height);
+      overflow: auto;
+      scrollbar-gutter: stable both-edges;
+      border-radius: var(--radius);
+    }
+
+    #saved-assessments .flexible-controls{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      margin: 6px 0 10px;
+    }
+    #saved-assessments .flexible-controls .form-group{ min-width: 160px; }
+
+    #saved-assessments table.table{
+      width: 100%;
+      min-width: var(--ft-minw);
+      table-layout: fixed;
+      border-collapse: separate;
+    }
+
+    #saved-assessments table.table thead th{
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--ft-header-solid) !important;
+    }
+
+    #saved-assessments table.table thead th:first-child{
+      position: sticky; left: 0; z-index: 6; background: var(--ft-header-solid) !important;
+    }
+    #saved-assessments table.table tbody td:first-child{
+      position: sticky; left: 0; z-index: 4; background: var(--ft-firstcol-solid) !important;
+      white-space: nowrap; font-weight:700; color:#E6EEF6;
+    }
+
+    /* second sticky + right sticky are defined in styles.css (percent offsets) */
+  </style>
+</head>
+<body>
+  <header class="app-header container">
+    <h1 class="text-lg">Assessment Form</h1>
+    <div class="subtitle muted">Record patient toxicity and follow-up</div>
+  </header>
+
+  <main class="container">
+    <!-- ============== FORM CARD ============== -->
+    <section class="card" id="form-card">
+      <!-- Tabs -->
+      <div class="tabs" role="tablist" aria-label="Assessment Sections">
+        <button class="tab-btn" role="tab" aria-selected="true"  aria-controls="tab-patient"   id="tabbtn-patient">🧾 Patient</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-regimen"   id="tabbtn-regimen">🗓️ Regimen & Dates</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-tox"       id="tabbtn-tox">🧪 Toxicity</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-decisions" id="tabbtn-decisions">⚖️ Decisions & Notes</button>
+      </div>
+
+      <form id="assessment-form" novalidate autocomplete="on">
+        <!-- ========== Patient ========== -->
+        <div class="tab-panel active" id="tab-patient" role="tabpanel" aria-labelledby="tabbtn-patient">
+          <div class="form-row">
+            <div class="form-group col-4">
+              <label for="patient_name"><span class="icon">👤</span>Name</label>
+              <input id="patient_name" name="patient_name" type="text" placeholder="e.g., Full name" autocomplete="name" />
+            </div>
+            <div class="form-group col-3">
+              <label for="patient_id"><span class="icon">#</span>ID</label>
+              <input id="patient_id" name="patient_id" type="text" placeholder="e.g., MRN" autocomplete="off" />
+            </div>
+            <div class="form-group col-3">
+              <label for="patient_phone"><span class="icon">📞</span>Phone</label>
+              <input id="patient_phone" name="patient_phone" type="tel" placeholder="+972... or 05x-xxxxxxx" autocomplete="tel" />
+            </div>
+            <div class="form-group col-1">
+              <label for="sex">Sex</label>
+              <select id="sex" name="sex" autocomplete="off">
+                <option value="">—</option><option value="M">M</option><option value="F">F</option>
+              </select>
+            </div>
+            <div class="form-group col-1">
+              <label for="age">Age</label>
+              <input id="age" name="age" type="number" inputmode="numeric" placeholder="e.g., 55" autocomplete="off" />
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <div class="section-title">
+            <h3>🧬 Cancer &amp; Stage</h3>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="diagnosis_select">Cancer type</label>
+              <select id="diagnosis_select" autocomplete="off">
+                <option value="">Select…</option>
+                <option>Colon</option><option>Rectal</option><option>Gastric</option>
+                <option>Pancreatic</option><option>Breast</option><option>Head &amp; Neck</option>
+                <option>Lung</option><option>Other</option>
+                <!-- NEW -->
+                <option>Esophageal</option>
+                <option>Head &amp; Neck SCC</option>
+                <option>anal</option>
+              </select>
+              <input id="diagnosis_other" type="text" placeholder="Type cancer…" style="display:none;margin-top:.4rem" />
+              <input id="diagnosis" name="diagnosis" type="hidden" />
+            </div>
+
+            <div class="form-group col-3">
+              <label for="stage">Stage</label>
+              <select id="stage" name="stage" autocomplete="off">
+                <option value="">Select…</option><option>1</option><option>2</option><option>3</option><option>4</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== Regimen & Dates ========== -->
+        <div class="tab-panel" id="tab-regimen" role="tabpanel" aria-labelledby="tabbtn-regimen">
+          <div class="section-title"><h3>🧪 Regimen &amp; Dates</h3></div>
+          <div class="form-row">
+            <div class="form-group col-8">
+              <label for="regimen_select">Regimen</label>
+              <select id="regimen_select" autocomplete="off">
+                <option value="">Select…</option>
+                <option>FOLFOX</option><option>FOLFIRI</option><option>FOLFIRINOX</option>
+                <option>Capecitabine</option><option>CapeOX</option><option>TPF</option>
+                <option>PF</option><option>FLOT</option><option>Other</option>
+              </select>
+              <input id="regimen_other" type="text" placeholder="Type regimen…" style="display:none;margin-top:.4rem" />
+              <input id="regimen" name="regimen" type="hidden" />
+            </div>
+
+            <div class="form-group col-2">
+              <label for="assessment_date">Assessment Date</label>
+              <input id="assessment_date" name="assessment_date" type="date" autocomplete="off" />
+            </div>
+            <div class="form-group col-2">
+              <label for="cycle">Cycle</label>
+              <input id="cycle" name="cycle" type="number" inputmode="numeric" placeholder="e.g., 2" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-4">
+              <label for="first_date_5fu">1st date 5FU</label>
+              <input id="first_date_5fu" name="first_date_5fu" type="date" autocomplete="off" />
+            </div>
+          </div>
+
+          <script>
+            (function(){
+              var el = document.getElementById('first_date_5fu');
+              if (el && !el.value) {
+                var d = new Date(); var pad = function(n){ return String(n).padStart(2,'0'); };
+                el.value = d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+              }
+            })();
+          </script>
+
+          <div class="form-row">
+            <div class="form-group col-6 highlight">
+              <label for="followup_due">Next phone follow-up</label>
+              <div class="flex items-center gap-2">
+                <input id="followup_due" name="followup_due" type="date" autocomplete="off" />
+                <button type="button" class="btn" data-nw="1">1w</button>
+                <button type="button" class="btn" data-nw="2">2w</button>
+                <button type="button" class="btn" data-nw="3">3w</button>
+                <button type="button" class="btn" data-nw="4">4w</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== Toxicity (CTCAE v5.0) ========== -->
+        <div class="tab-panel" id="tab-tox" role="tabpanel" aria-labelledby="tabbtn-tox">
+          <div class="section-title"><h3>🧯 Toxicity (CTCAE v5.0)</h3></div>
+
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="toxicity_found">Toxicity found?</label>
+              <select id="toxicity_found" name="toxicity_found" autocomplete="off">
+                <option value="">—</option><option>No</option><option>Yes</option>
+              </select>
+            </div>
+            <div class="form-group col-6">
+              <label for="toxicity">Overall grade</label>
+              <input id="toxicity" name="toxicity" type="text" readonly placeholder="Auto (max of below)" />
+            </div>
+          </div>
+
+          <!-- Mucositis -->
+          <div class="form-row">
+            <div class="form-group col-12">
+              <label>Mucositis</label>
+              <div class="grade-bar" data-target="mucositis_grade">
+                <button type="button" class="grade-btn" data-grade="G0">G0</button>
+                <button type="button" class="grade-btn" data-grade="G1">G1</button>
+                <button type="button" class="grade-btn" data-grade="G2">G2</button>
+                <button type="button" class="grade-btn" data-grade="G3">G3</button>
+                <button type="button" class="grade-btn" data-grade="G4">G4</button>
+              </div>
+              <select id="mucositis_grade" name="mucositis_grade" style="display:none">
+                <option value="">—</option><option>G0</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Diarrhea -->
+          <div class="form-row">
+            <div class="form-group col-12">
+              <label>Diarrhea</label>
+              <div class="grade-bar" data-target="diarrhea_grade">
+                <button type="button" class="grade-btn" data-grade="G0">G0</button>
+                <button type="button" class="grade-btn" data-grade="G1">G1</button>
+                <button type="button" class="grade-btn" data-grade="G2">G2</button>
+                <button type="button" class="grade-btn" data-grade="G3">G3</button>
+                <button type="button" class="grade-btn" data-grade="G4">G4</button>
+              </div>
+              <select id="diarrhea_grade" name="diarrhea_grade" style="display:none">
+                <option value="">—</option><option>G0</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Neutropenia -->
+          <div class="form-row">
+            <div class="form-group col-12">
+              <label>Neutropenia</label>
+              <div class="grade-bar" data-target="neutropenia_grade">
+                <button type="button" class="grade-btn" data-grade="G0">G0</button>
+                <button type="button" class="grade-btn" data-grade="G1">G1</button>
+                <button type="button" class="grade-btn" data-grade="G2">G2</button>
+                <button type="button" class="grade-btn" data-grade="G3">G3</button>
+                <button type="button" class="grade-btn" data-grade="G4">G4</button>
+              </div>
+              <select id="neutropenia_grade" name="neutropenia_grade" style="display:none">
+                <option value="">—</option><option>G0</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Other toxicity -->
+          <div class="form-row">
+            <div class="form-group col-8">
+              <label for="other_tox_name">Other toxicity (name)</label>
+              <input id="other_tox_name" name="other_tox_name" type="text" placeholder="e.g., Hand-Foot" autocomplete="off" />
+            </div>
+            <div class="form-group col-4">
+              <label for="other_tox_grade">Other toxicity grade</label>
+              <select id="other_tox_grade" name="other_tox_grade" autocomplete="off">
+                <option value="">—</option><option>G0</option><option>G1</option><option>G2</option><option>G3</option><option>G4</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== Decisions & Notes ========== -->
+        <div class="tab-panel" id="tab-decisions" role="tabpanel" aria-labelledby="tabbtn-decisions">
+          <div class="section-title"><h3>⚖️ Treatment decisions related to toxicity</h3></div>
+          <div class="form-row">
+            <div class="form-group col-3">
+              <label for="hospitalization_due_tox">Hospitalization Due to Toxicity</label>
+              <select id="hospitalization_due_tox" name="hospitalization_due_tox" autocomplete="off">
+                <option value="">—</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div class="form-group col-2">
+              <label for="delay">Delay</label>
+              <select id="delay" name="delay" autocomplete="off">
+                <option value="">—</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div class="form-group col-2">
+              <label for="stop">Stop</label>
+              <select id="stop" name="stop" autocomplete="off">
+                <option value="">—</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div class="form-group col-3">
+              <label for="dose_modification">Dose modification</label>
+              <select id="dose_modification" name="dose_modification" autocomplete="off">
+                <option value="">—</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div class="form-group col-2">
+              <label for="dose_reduction_pct">Dose reduction (%)</label>
+              <input id="dose_reduction_pct" name="dose_reduction_pct" type="number" min="0" max="100" step="1" placeholder="e.g., 25" />
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <div class="form-row">
+            <div class="form-group col-12">
+              <label for="notes"><span class="icon">📝</span>Notes</label>
+              <textarea id="notes" name="notes" rows="4" placeholder="Free text…" autocomplete="off"></textarea>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- Sticky actions under the card (visible in all tabs) -->
+      <div class="form-sticky-actions">
+        <button type="button" id="btn-save" class="btn btn-primary cta">💾 Save Entry</button>
+        <button type="reset"  id="btn-reset" class="btn">↺ Reset Form</button>
+      </div>
+    </section>
+
+    <!-- ============== SAVED TABLE ============== -->
+    <section class="card table-card">
+      <div class="card-title">
+        <div class="flex items-center gap-2">
+          <span class="badge">Saved assessments</span>
+        </div>
+      </div>
+
+      <div id="saved_toolbar" class="header-bar"></div>
+
+      <!-- Scrollable wrapper; table rendered inside -->
+      <div id="saved-assessments"></div>
+    </section>
+  </main>
+
+  <!-- ============== Scripts (keep order) ============== -->
+  <script src="app-data.js"></script>
+  <script src="ctcae.js"></script>
+  <script src="app-utils.js"></script>
+  <script src="app-extensions.js"></script>
+  <script src="app-tox-helpers.js"></script>
+  <script src="app-toxrow.js"></script>
+  <script src="app-sheets.js"></script>
+  <script src="app-csv.js"></script>
+  <script src="app-dom-helpers.js"></script>
+  <script src="app-phone.shared.js"></script>
+  <script src="app-phone.skeleton.js"></script>
+  <script src="app-phone.dpyd.js"></script>
+  <script src="app-phone.prevvisit.js"></script>
+  <script src="app-phone.table.js"></script>
+  <script src="app-phone.events.js"></script>
+  <script src="app-phone.js"></script>
+  <script src="app-result.js"></script>
+  <script src="app-whole-result.js"></script>
+  <script src="app-whole-result.launcher.js"></script>
+  <script src="app-init.js"></script>
+
+  <script>
+    (function(){
+      'use strict';
+
+      function syncBar(bar){
+        var targetId = bar.getAttribute('data-target');
+        var select = document.getElementById(targetId);
+        if (!select) return;
+        bar.querySelectorAll('.grade-btn').forEach(function(btn){
+          btn.classList.toggle('active', select.value === btn.dataset.grade);
+        });
+      }
+      function pick(bar, grade){
+        var targetId = bar.getAttribute('data-target');
+        var select = document.getElementById(targetId);
+        if (!select) return;
+        select.value = grade;
+        select.dispatchEvent(new Event('input', {bubbles:true}));
+        select.dispatchEvent(new Event('change', {bubbles:true}));
+        syncBar(bar);
+      }
+      function initBars(){
+        document.querySelectorAll('.grade-bar').forEach(function(bar){
+          bar.addEventListener('click', function(e){
+            var b = e.target.closest('.grade-btn');
+            if (b) pick(bar, b.dataset.grade);
+          });
+          syncBar(bar);
+        });
+      }
+
+      function initDiagnosis(){
+        var sel = document.getElementById('diagnosis_select');
+        var inp = document.getElementById('diagnosis_other');
+        var hid = document.getElementById('diagnosis');
+        function update(){
+          var v = sel.value;
+          if (v === 'Other') { inp.style.display = ''; hid.value = (inp.value || '').trim(); }
+          else { inp.style.display = 'none'; hid.value = v || ''; }
+        }
+        sel.addEventListener('change', update);
+        inp.addEventListener('input', update);
+        update();
+      }
+
+      function initRegimen(){
+        var sel = document.getElementById('regimen_select');
+        var inp = document.getElementById('regimen_other');
+        var hid = document.getElementById('regimen');
+        function update(){
+          var v = sel.value;
+          if (v === 'Other') { inp.style.display = ''; hid.value = (inp.value || '').trim(); }
+          else { inp.style.display = 'none'; hid.value = v || ''; }
+        }
+        sel.addEventListener('change', update);
+        inp.addEventListener('input', update);
+        update();
+      }
+
+      function initTabs(){
+        const btns = Array.from(document.querySelectorAll('.tab-btn'));
+        const panels = Array.from(document.querySelectorAll('.tab-panel'));
+        btns.forEach(b=>{
+          b.addEventListener('click', ()=>{
+            btns.forEach(x=>x.setAttribute('aria-selected','false'));
+            panels.forEach(p=>p.classList.remove('active'));
+            b.setAttribute('aria-selected','true');
+            const id = b.getAttribute('aria-controls');
+            const panel = document.getElementById(id);
+            if (panel) panel.classList.add('active');
+          });
+        });
+      }
+
+      // Defaults: set to "No"
+      function setDefaultNo(id){
+        var el = document.getElementById(id);
+        if (el && !el.value) el.value = 'No';
+      }
+      function initDefaults(){
+        setDefaultNo('hospitalization_due_tox');
+        setDefaultNo('delay');
+        setDefaultNo('stop');
+        setDefaultNo('dose_modification');
+        setDefaultNo('toxicity_found');
+      }
+
+      // Lock G0 when toxicity_found = No; unlock when Yes
+      function setGrade(targetId, grade){
+        var sel = document.getElementById(targetId);
+        if (!sel) return;
+        sel.value = grade;
+        sel.dispatchEvent(new Event('input', {bubbles:true}));
+        sel.dispatchEvent(new Event('change', {bubbles:true}));
+        var bar = document.querySelector('.grade-bar[data-target="'+targetId+'"]');
+        if (bar) bar.querySelectorAll('.grade-btn').forEach(function(btn){ btn.classList.toggle('active', btn.dataset.grade===grade); });
+      }
+      function setBarsDisabled(disabled){
+        document.querySelectorAll('.grade-bar').forEach(function(bar){
+          bar.classList.toggle('disabled', disabled);
+        });
+      }
+      function initFoundLock(){
+        var found = document.getElementById('toxicity_found');
+        var handler = function(){
+          if (found.value === 'No'){
+            setGrade('mucositis_grade','G0');
+            setGrade('diarrhea_grade','G0');
+            setGrade('neutropenia_grade','G0');
+            setBarsDisabled(true);
+          } else {
+            setBarsDisabled(false);
+          }
+        };
+        found.addEventListener('change', handler);
+        handler();
+      }
+
+      // Quick buttons for Next phone follow-up
+      function initNextFollowupQuick(){
+        var inp = document.getElementById('followup_due');
+        if (!inp) return;
+        function addDays(d, n){ var x = new Date(d); x.setDate(x.getDate()+n); return x; }
+        function toYMD(d){ var p=(n)=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+        document.querySelectorAll('[data-nw]').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            var weeks = parseInt(btn.getAttribute('data-nw'),10)||1;
+            var d = new Date();
+            var out = toYMD(addDays(d, weeks*7));
+            inp.value = out;
+            inp.dispatchEvent(new Event('change', {bubbles:true}));
+          });
+        });
+      }
+
+      // === Tooltips for DPYD & Other tox (auto-fill title with full text) ===
+      function initSavedTableTooltips(){
+        const host = document.getElementById('saved-assessments');
+        if (!host) return;
+        const setTitles = function(root){
+          try{
+            root.querySelectorAll('table.table tbody tr').forEach(function(tr){
+              const dpyd = tr.children[7];   // 8th column
+              const other= tr.children[8];   // 9th column
+              if (dpyd && dpyd.textContent.trim())  dpyd.title  = dpyd.textContent.trim();
+              if (other && other.textContent.trim()) other.title = other.textContent.trim();
+            });
+          }catch(_){}
+        };
+        const obs = new MutationObserver(function(muts){
+          muts.forEach(function(m){
+            if (m.type === 'childList') setTitles(host);
+          });
+        });
+        obs.observe(host, { childList:true, subtree:true });
+        setTitles(host);
+      }
+
+      document.addEventListener('DOMContentLoaded', function(){
+        initBars();
+        initDiagnosis();
+        initRegimen();
+        initTabs();
+        initDefaults();
+        initFoundLock();
+        initNextFollowupQuick();
+        initSavedTableTooltips();
+      });
+    })();
+  </script>
+</body>
+</html>
