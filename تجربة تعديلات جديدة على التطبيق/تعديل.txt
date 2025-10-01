@@ -1,0 +1,147 @@
+Whole Result (داخل تبويب Results — داخل مودال مستقل)
+
+النطاق: واجهة عرض وتحليل متقدّم. الهدف تجميع كل سجلات المريض وعرض سطر واحد لكل مريض، لكن داخل مودال مستقل للحفاظ على ترتيب صفحة Results.
+
+ما المطلوب؟
+
+إضافة زر/Badge في تبويب Results بعنوان Whole Result.
+
+عند الضغط عليه يُفتح مودال مخصص يحتوي:
+
+جدول Whole Result (ملخّص لكل مريض).
+
+Pivot Table مبنية على Whole Result.
+
+بذلك تبقى صفحة Results الرئيسية مرتبة (Mini Dashboard, Charts, Toxicity distribution) ويكون الـ Whole Result في مساحة منفصلة عند الحاجة.
+
+الأعمدة (داخل جدول Whole Result في المودال)
+A) بيانات أساسية (Patient Basics)
+
+Patient Name (مثبّت ومميّز)
+
+Patient ID / MRN (إن وجد)
+
+Age أو تاريخ الميلاد
+
+Sex
+
+Cancer type (baseline)
+
+Regimen (baseline)
+
+Baseline assessment date
+
+B) أسئلة منطقية (Yes/No)
+
+Ever hospitalized due to toxicity?
+
+Any delay?
+
+Any stop?
+
+Any dose modification?
+
+Toxicity ever found?
+
+C) Toxicity Grades (قيم قصوى)
+
+Highest Mucositis grade
+
+Highest Neutropenia grade
+
+Highest Diarrhea grade
+
+Highest Overall grade
+
+D) DPYD
+
+DPYD present?
+
+DPYD mutation
+
+السلوك والتجميع
+
+تجميع حسب: Patient ID (أولوية) أو Name عند غياب ID.
+
+Baseline: أول Assessment زمنيًا.
+
+Yes/No: OR logic عبر كل السجلات.
+
+Grades: Max عبر كل السجلات.
+
+DPYD: من Baseline أو أحدث قيمة.
+
+Pivot Table (داخل المودال)
+
+تعمل فقط على بيانات Whole Result (سطر لكل مريض).
+
+اختيارات:
+
+Rows: أي حقل (Cancer type, Regimen, Sex, DPYD present).
+
+Columns: أي حقل منطقي أو Grade (Toxicity found, Highest Overall grade).
+
+Values: Count, %, Max, Avg.
+
+Filters: سنة baseline, Regimen, Sex او اي حقل منطقي مثل الاسئلة المنطقية و dpd present
+
+Drill-down: النقر على أي خلية يظهر قائمة المرضى.
+
+Export: CSV/XLSX.
+اضافة mini dashboard خاص بال whole assessment بكل ما سبق من الاسئلة المنطقية والحقول الاخرى 
+
+الموضع والشكل
+
+صفحة Results:
+
+Mini Dashboard, Assessments per month, Toxicity distribution تبقى كما هي.
+
+Badge أو زر "Whole Result" في الأعلى/الزاوية.
+
+عند الضغط → يفتح مودال بحجم كبير (fullscreen أو 80% من العرض).
+
+المودال يحتوي:
+
+جدول Whole Result
+
+Pivot Table أسفله
+
+زر إغلاق يعيدني إلى Results.
+
+إمكانية الوصول
+
+الزر: aria-label="Open whole result summary"
+
+المودال: عنوان واضح "Whole Result per patient"
+
+الجدول: Name عمود مثبت، scroll داخل المودال.
+
+Pivot: نفس إمكانية الوصول مثل أي جدول ديناميكي.
+
+أمثلة قبول (Acceptance)
+
+الضغط على زر Whole Result يفتح المودال بالجدول.
+
+الجدول يعرض صفًا واحدًا لكل مريض مع كل الأعمدة المذكورة.
+
+Badge تعرض عدد المرضى الفريدين.
+
+Pivot Table تعرض توزيع المرضى عند اختيار Rows/Columns/Values.
+
+Drill-down يعمل على أي خلية.
+
+Export CSV/XLSX يعمل.
+
+إغلاق المودال يعيدني للصفحة كما هي.
+
+الخطة
+
+تجهيز JSON/Array لــ Whole Result (per patient).
+
+بناء الجدول داخل المودال.
+
+إضافة Pivot Table فوقه أو تحته داخل نفس المودال.
+
+زر/Badge في Results يفتح المودال.
+
+التأكد من أن المودال مستقل (لا يخرب الصفحة الرئيسية).
